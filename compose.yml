@@ -1,0 +1,79 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-euphoria}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+      POSTGRES_DB: ${POSTGRES_DB:-euphoria_panel}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ep-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-euphoria} -d ${POSTGRES_DB:-euphoria_panel}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      PORT: ${BACKEND_PORT:-8001}
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-euphoria}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-euphoria_panel}
+      SECRET_KEY: ${SECRET_KEY:?}
+      APP_ENV: production
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+      PTERO_PANEL_URL: ${PTERO_PANEL_URL:-}
+      PTERO_API_KEY: ${PTERO_API_KEY:-}
+      PTERO_DEFAULT_NODE_ID: ${PTERO_DEFAULT_NODE_ID:-}
+      PTERO_DEFAULT_LOCATION_ID: ${PTERO_DEFAULT_LOCATION_ID:-}
+      PTERO_DEFAULT_EGG_ID: ${PTERO_DEFAULT_EGG_ID:-}
+      PTERO_DEFAULT_NEST_ID: ${PTERO_DEFAULT_NEST_ID:-}
+      PTERO_DEFAULT_ALLOCATION_ID: ${PTERO_DEFAULT_ALLOCATION_ID:-}
+      MAX_SERVERS_PER_USER: ${MAX_SERVERS_PER_USER:-3}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:-}
+      DISCORD_REDIRECT_URI: ${DISCORD_REDIRECT_URI:-}
+      DISCORD_REWARD_COINS: ${DISCORD_REWARD_COINS:-50}
+      MAINTENANCE_MODE: ${MAINTENANCE_MODE:-false}
+      REGISTRATION_ENABLED: ${REGISTRATION_ENABLED:-true}
+      CLAIMS_ENABLED: ${CLAIMS_ENABLED:-true}
+      FRONTEND_URL: ${FRONTEND_URL:-}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+    ports:
+      - "${BACKEND_PORT:-8001}:${BACKEND_PORT:-8001}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ep-net
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-}
+        BACKEND_URL: http://backend:${BACKEND_PORT:-8001}
+    environment:
+      PORT: ${FRONTEND_PORT:-3001}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-}
+      BACKEND_URL: http://backend:${BACKEND_PORT:-8001}
+    ports:
+      - "${FRONTEND_PORT:-3001}:${FRONTEND_PORT:-3001}"
+    depends_on:
+      - backend
+    networks:
+      - ep-net
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  ep-net:
+    driver: bridge

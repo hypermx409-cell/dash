@@ -1,0 +1,129 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #090a0c;
+  --bg-elev: #111317;
+  --bg-card: #13161b;
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #e6e8ee;
+  --muted: #8b93a3;
+  --accent: #e11d48;
+  --accent-2: #ff3b6b;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+}
+
+* { box-sizing: border-box; }
+
+.dash0-bg-gradient {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1100px 620px at 12% 0%, color-mix(in srgb, var(--accent), transparent 84%) 0%, transparent 70%),
+    radial-gradient(900px 560px at 92% 100%, color-mix(in srgb, var(--accent-2), transparent 86%) 0%, transparent 70%);
+}
+
+html, body {
+  height: 100%;
+  background: #090a0c;
+  color: var(--text);
+  font-family: var(--font-body), "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background-image:
+    radial-gradient(900px 520px at 12% 0%, color-mix(in srgb, var(--accent), transparent 84%) 0%, transparent 72%),
+    radial-gradient(760px 460px at 92% 100%, color-mix(in srgb, var(--accent-2), transparent 86%) 0%, transparent 70%),
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size: auto, auto, 32px 32px, 32px 32px;
+  background-position: center, center, -1px -1px, -1px -1px;
+  background-attachment: fixed, fixed, scroll, scroll;
+}
+
+h1, h2, h3, h4, h5, h6, .brand-font, .heading-font {
+  font-family: var(--font-heading), "Audiowide", system-ui, sans-serif;
+  font-weight: 400;
+}
+.extra-font { font-family: var(--font-extra), "Comfortaa", system-ui, sans-serif; }
+
+.rounded-md { border-radius: 6px !important; }
+.rounded-lg { border-radius: 8px !important; }
+.rounded-xl { border-radius: 10px !important; }
+.rounded-2xl { border-radius: 14px !important; }
+.rounded-3xl { border-radius: 18px !important; }
+.rounded-4xl { border-radius: 22px !important; }
+
+body {
+  margin: 0;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6, .brand-font, .heading-font {
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  font-weight: 500;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+.glass {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03), 0 10px 24px rgba(0, 0, 0, 0.2);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  box-shadow: none;
+}
+.btn-primary:hover { filter: brightness(1.05); }
+.btn-ghost { background: rgba(255,255,255,0.04); border-color: var(--border); color: var(--text); }
+.btn-ghost:hover { background: rgba(255,255,255,0.07); }
+.btn-danger { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.25); color: #fca5a5; }
+
+.input {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.875rem;
+  transition: border-color 0.15s ease;
+}
+.input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent), transparent 80%); }
+
+.input.pl-9, .input.pl-8 { padding-left: 2.25rem !important; }
+.input.pr-10 { padding-right: 2.5rem !important; }
+
+.badge { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:6px; font-size:0.72rem; font-weight:500; border:1px solid var(--border); background:rgba(255,255,255,0.04); }
+
+.fade-in { animation: fadein 0.2s ease both; }
+@keyframes fadein { from { opacity:0; } to { opacity:1; } }
+
+.sidebar-link { display:flex; align-items:center; gap:0.6rem; padding:0.5rem 0.7rem; border-radius:8px; color:var(--muted); font-size:0.875rem; transition: color .15s, background .15s; min-height: 34px; }
+.sidebar-link:hover { color:var(--text); background:rgba(255,255,255,0.04); }
+.sidebar-link.active { color:var(--text); background: rgba(255,255,255,0.05); border-left:2px solid var(--accent); }

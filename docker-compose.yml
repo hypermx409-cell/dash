@@ -1,0 +1,81 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-dash0}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dash0}
+      POSTGRES_DB: ${POSTGRES_DB:-dash0}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - dash0-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dash0}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-dash0}:${POSTGRES_PASSWORD:-dash0}@postgres:5432/${POSTGRES_DB:-dash0}
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-production-please}
+      APP_ENV: production
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3001}
+      PTERO_PANEL_URL: ${PTERO_PANEL_URL:-}
+      PTERO_API_KEY: ${PTERO_API_KEY:-}
+      PTERO_DEFAULT_NODE_ID: ${PTERO_DEFAULT_NODE_ID:-}
+      PTERO_DEFAULT_LOCATION_ID: ${PTERO_DEFAULT_LOCATION_ID:-}
+      PTERO_DEFAULT_EGG_ID: ${PTERO_DEFAULT_EGG_ID:-}
+      PTERO_DEFAULT_NEST_ID: ${PTERO_DEFAULT_NEST_ID:-}
+      PTERO_DEFAULT_ALLOCATION_ID: ${PTERO_DEFAULT_ALLOCATION_ID:-}
+      MAX_SERVERS_PER_USER: ${MAX_SERVERS_PER_USER:-3}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+    ports:
+      - "8001:8001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - dash0-net
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-}
+        BACKEND_URL: ${BACKEND_URL:-http://backend:8001}
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-}
+      BACKEND_URL: ${BACKEND_URL:-http://backend:8001}
+    ports:
+      - "3001:3001"
+    depends_on:
+      - backend
+    networks:
+      - dash0-net
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8080:80"
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - dash0-net
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  dash0-net:
+    driver: bridge
